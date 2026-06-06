@@ -1,11 +1,49 @@
 import 'package:flutter/material.dart';
 import 'builder_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   static const blue = Color(0xFF4674C3);
   static const gray = Color(0xFFAFAFAF);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String selectedCategory = '꽃';
+  String? selectedItem;
+  Map<String, int> colorQuantities = {};
+
+  final Map<String, List<String>> categoryItems = {
+    '꽃': ['장미\n그림', '해바라기\n그림', '카네이션\n그림', '튤립\n그림'],
+    '필러': ['안개꽃\n그림', '수국\n그림', '유칼립투스\n그림', '라그라스\n그림'],
+    '포장지': ['빨간색\n그림', '초록색\n그림', '분홍색\n그림', '흰색\n그림'],
+    '리본': ['빨간 리본\n그림', '흰 리본\n그림', '금색 리본\n그림'],
+    '문구': ['생일축하\n문구', '사랑해\n문구', '감사해\n문구'],
+  };
+
+  final Map<String, List<String>> itemColors = {
+    '장미\n그림': ['빨간장미 그림', '노란장미 그림', '주황장미 그림', '분홍장미 그림'],
+    '해바라기\n그림': ['노란해바라기 그림', '주황해바라기 그림'],
+    '카네이션\n그림': ['빨간카네이션 그림', '분홍카네이션 그림', '흰카네이션 그림'],
+    '튤립\n그림': ['빨간튤립 그림', '노란튤립 그림', '분홍튤립 그림'],
+    '안개꽃\n그림': ['하얀안개꽃 그림', '파란안개꽃 그림', '분홍안개꽃 그림'],
+    '수국\n그림': ['파란수국 그림', '분홍수국 그림', '흰수국 그림'],
+    '유칼립투스\n그림': ['초록유칼립투스 그림'],
+    '라그라스\n그림': ['베이지라그라스 그림'],
+    '빨간색\n그림': ['빨간색 포장지'],
+    '초록색\n그림': ['초록색 포장지'],
+    '분홍색\n그림': ['분홍색 포장지'],
+    '흰색\n그림': ['흰색 포장지'],
+    '빨간 리본\n그림': ['빨간 리본'],
+    '흰 리본\n그림': ['흰 리본'],
+    '금색 리본\n그림': ['금색 리본'],
+    '생일축하\n문구': ['생일축하'],
+    '사랑해\n문구': ['사랑해'],
+    '감사해\n문구': ['감사해'],
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -18,46 +56,31 @@ class HomeScreen extends StatelessWidget {
             color: Colors.white,
             child: Column(
               children: [
-                const SizedBox(height: 15),
+                const SizedBox(height: 30),
 
-                // Title
-                Container(
-                  width: 390,
-                  height: 44,
-                  alignment: Alignment.center,
-                  color: Colors.white,
-                  child: const Text(
-                    '나만의 꽃 만들기',
-                    style: TextStyle(color: Colors.black, fontSize: 20, fontStyle: FontStyle.italic),
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                // Search
                 Container(
                   width: 515,
                   height: 38,
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   alignment: Alignment.centerLeft,
                   child: const Text(
-                    '🔎 Search',
-                    style: TextStyle(fontSize: 17),
+                    '🔎 #사랑 #우정 #행복 #기념일',
+                    style: TextStyle(fontSize: 17, color: Colors.grey),
                   ),
                 ),
 
                 const SizedBox(height: 30),
 
-                // Category + flower images
                 Container(
                   width: 515,
                   height: 212,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     children: [
@@ -65,29 +88,45 @@ class HomeScreen extends StatelessWidget {
                         height: 36,
                         decoration: const BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(color: Colors.black),
+                            bottom: BorderSide(color: Colors.grey),
                           ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: const [
-                            CategoryButton(text: '꽃'),
-                            CategoryButton(text: '필러'),
-                            CategoryButton(text: '포장지'),
-                          ],
+                          children: categoryItems.keys.map((category) {
+                            return CategoryButton(
+                              text: category,
+                              isSelected: selectedCategory == category,
+                              onTap: () {
+                                setState(() {
+                                  selectedCategory = category;
+                                  selectedItem = null;
+                                });
+                              },
+                            );
+                          }).toList(),
                         ),
                       ),
+
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: const [
-                              FlowerBox(text: '장미\n그림', color: gray),
-                              FlowerBox(text: '해바라기\n그림'),
-                              FlowerBox(text: '카네이션\n그림'),
-                              FlowerBox(text: '튤립\n그림'),
-                            ],
+                            children:
+                                categoryItems[selectedCategory]!.map((item) {
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedItem = item;
+                                  });
+                                },
+                                child: FlowerBox(
+                                  text: item,
+                                  isSelected: selectedItem == item,
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
                       ),
@@ -101,19 +140,18 @@ class HomeScreen extends StatelessWidget {
                   width: 140,
                   height: 24,
                   alignment: Alignment.center,
-                  color: blue,
+                  color: HomeScreen.blue,
                   child: const Text(
-                    '꽃 색상',
+                    '상세 옵션',
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
 
                 const SizedBox(height: 6),
 
-                // Color options
                 Container(
                   width: 510,
-                  height: 213,
+                  constraints: const BoxConstraints(minHeight: 80),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 18,
@@ -121,15 +159,55 @@ class HomeScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                   ),
-                  child: Column(
-                    children: const [
-                      ColorRow(text: '빨간장미 그림'),
-                      SizedBox(height: 10),
-                      ColorRow(text: '노란장미 그림'),
-                      SizedBox(height: 10),
-                      ColorRow(text: '주황장미 그림'),
-                    ],
-                  ),
+                  child: selectedItem == null || !itemColors.containsKey(selectedItem)
+                      ? Center(
+                          child: Text(
+                            '꽃을 선택해주세요',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ...itemColors[selectedItem]!
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                              final colorName = entry.value;
+                              final isLast =
+                                  entry.key == itemColors[selectedItem]!.length - 1;
+                              return Column(
+                                children: [
+                                  ColorRow(
+                                    text: colorName,
+                                    quantity: colorQuantities[colorName] ?? 0,
+                                    onPlus: () {
+                                      setState(() {
+                                        colorQuantities[colorName] =
+                                            (colorQuantities[colorName] ?? 0) + 1;
+                                      });
+                                    },
+                                    onMinus: () {
+                                      setState(() {
+                                        final current =
+                                            colorQuantities[colorName] ?? 0;
+                                        if (current > 0) {
+                                          colorQuantities[colorName] =
+                                              current - 1;
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  if (!isLast)
+                                    const SizedBox(height: 10),
+                                ],
+                              );
+                            }).toList(),
+                          ],
+                        ),
                 ),
 
                 const Spacer(),
@@ -142,7 +220,7 @@ class HomeScreen extends StatelessWidget {
                       width: 100,
                       height: 100,
                       decoration: const BoxDecoration(
-                        color: blue,
+                        color: HomeScreen.blue,
                         shape: BoxShape.circle,
                       ),
                       alignment: Alignment.center,
@@ -157,10 +235,9 @@ class HomeScreen extends StatelessWidget {
 
                 const SizedBox(height: 18),
 
-                // Bottom navigation
                 Container(
                   height: 54,
-                  color: gray,
+                  color: HomeScreen.gray,
                   padding: const EdgeInsets.symmetric(horizontal: 60),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -193,19 +270,29 @@ class HomeScreen extends StatelessWidget {
 
 class CategoryButton extends StatelessWidget {
   final String text;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
-  const CategoryButton({super.key, required this.text});
+  const CategoryButton({
+    super.key,
+    required this.text,
+    this.isSelected = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 70,
-      height: 24,
-      alignment: Alignment.center,
-      color: HomeScreen.blue,
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 70,
+        height: 24,
+        alignment: Alignment.center,
+        color: isSelected ? HomeScreen.blue : HomeScreen.gray,
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+        ),
       ),
     );
   }
@@ -214,11 +301,13 @@ class CategoryButton extends StatelessWidget {
 class FlowerBox extends StatelessWidget {
   final String text;
   final Color color;
+  final bool isSelected;
 
   const FlowerBox({
     super.key,
     required this.text,
     this.color = HomeScreen.blue,
+    this.isSelected = false,
   });
 
   @override
@@ -227,11 +316,17 @@ class FlowerBox extends StatelessWidget {
       width: 92,
       height: 128,
       alignment: Alignment.center,
-      color: color,
+      decoration: BoxDecoration(
+        color: isSelected ? HomeScreen.blue : Colors.grey[300],
+        border: isSelected ? Border.all(color: HomeScreen.blue, width: 3) : null,
+      ),
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white, fontSize: 17),
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.black,
+          fontSize: 17,
+        ),
       ),
     );
   }
@@ -239,8 +334,17 @@ class FlowerBox extends StatelessWidget {
 
 class ColorRow extends StatelessWidget {
   final String text;
+  final int quantity;
+  final VoidCallback? onPlus;
+  final VoidCallback? onMinus;
 
-  const ColorRow({super.key, required this.text});
+  const ColorRow({
+    super.key,
+    required this.text,
+    this.quantity = 0,
+    this.onPlus,
+    this.onMinus,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -257,11 +361,11 @@ class ColorRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 18),
-        const SmallButton(text: '-'),
+        SmallButton(text: '-', onTap: onMinus),
         const SizedBox(width: 6),
-        const SmallButton(text: '~EA', width: 55),
+        SmallButton(text: '${quantity}EA', width: 55),
         const SizedBox(width: 6),
-        const SmallButton(text: '+'),
+        SmallButton(text: '+', onTap: onPlus),
       ],
     );
   }
@@ -270,23 +374,28 @@ class ColorRow extends StatelessWidget {
 class SmallButton extends StatelessWidget {
   final String text;
   final double width;
+  final VoidCallback? onTap;
 
   const SmallButton({
     super.key,
     required this.text,
     this.width = 24,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: 25,
-      alignment: Alignment.center,
-      color: HomeScreen.blue,
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: 25,
+        alignment: Alignment.center,
+        color: HomeScreen.blue,
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+        ),
       ),
     );
   }
