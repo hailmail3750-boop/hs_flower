@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'builder_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class CreateFlower extends StatefulWidget {
+  const CreateFlower({super.key});
 
   static const blue = Color(0xFF4674C3);
   static const gray = Color(0xFFAFAFAF);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<CreateFlower> createState() => _CreateFlowerState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _CreateFlowerState extends State<CreateFlower> {
   String selectedCategory = '꽃';
   String? selectedItem;
   Map<String, int> colorQuantities = {};
@@ -49,6 +48,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E5E5),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '나만의 꽃 만들기',
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: Container(
@@ -140,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 140,
                   height: 24,
                   alignment: Alignment.center,
-                  color: HomeScreen.blue,
+                  color: CreateFlower.blue,
                   child: const Text(
                     '상세 옵션',
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -220,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 100,
                       height: 100,
                       decoration: const BoxDecoration(
-                        color: HomeScreen.blue,
+                        color: CreateFlower.blue,
                         shape: BoxShape.circle,
                       ),
                       alignment: Alignment.center,
@@ -234,31 +245,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 const SizedBox(height: 18),
-
-                Container(
-                  height: 54,
-                  color: HomeScreen.gray,
-                  padding: const EdgeInsets.symmetric(horizontal: 60),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const BottomButton(text: '오늘의 꽃'),
-                      BottomButton(
-                        text: 'Home',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const BuilderScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const BottomButton(text: 'My page'),
-                      const BottomButton(text: '⚙'),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -288,7 +274,7 @@ class CategoryButton extends StatelessWidget {
         width: 70,
         height: 24,
         alignment: Alignment.center,
-        color: isSelected ? HomeScreen.blue : HomeScreen.gray,
+        color: isSelected ? CreateFlower.blue : CreateFlower.gray,
         child: Text(
           text,
           style: const TextStyle(color: Colors.white, fontSize: 16),
@@ -306,7 +292,7 @@ class FlowerBox extends StatelessWidget {
   const FlowerBox({
     super.key,
     required this.text,
-    this.color = HomeScreen.blue,
+    this.color = CreateFlower.blue,
     this.isSelected = false,
   });
 
@@ -317,8 +303,8 @@ class FlowerBox extends StatelessWidget {
       height: 128,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: isSelected ? HomeScreen.blue : Colors.grey[300],
-        border: isSelected ? Border.all(color: HomeScreen.blue, width: 3) : null,
+        color: isSelected ? CreateFlower.blue : Colors.grey[300],
+        border: isSelected ? Border.all(color: CreateFlower.blue, width: 3) : null,
       ),
       child: Text(
         text,
@@ -354,7 +340,7 @@ class ColorRow extends StatelessWidget {
           width: 188,
           height: 52,
           alignment: Alignment.center,
-          color: HomeScreen.blue,
+          color: CreateFlower.blue,
           child: Text(
             text,
             style: const TextStyle(color: Colors.white, fontSize: 17),
@@ -391,38 +377,10 @@ class SmallButton extends StatelessWidget {
         width: width,
         height: 25,
         alignment: Alignment.center,
-        color: HomeScreen.blue,
+        color: CreateFlower.blue,
         child: Text(
           text,
           style: const TextStyle(color: Colors.white, fontSize: 15),
-        ),
-      ),
-    );
-  }
-}
-
-class BottomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onTap;
-
-  const BottomButton({
-    super.key,
-    required this.text,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: text == '⚙' ? 45 : 92,
-        height: 48,
-        alignment: Alignment.center,
-        color: HomeScreen.blue,
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
         ),
       ),
     );

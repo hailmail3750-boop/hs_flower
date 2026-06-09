@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/bouquet_option.dart';
-import 'result_screen.dart';
+import 'result.dart';
 
 class BuilderScreen extends StatefulWidget {
   const BuilderScreen({super.key});
@@ -13,7 +13,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
   String flowerType = 'Rose';
   String flowerColor = 'Pink';
   int quantity = 5;
-  String filler = 'Baby’s Breath';
+  String filler = 'Baby\'s Breath';
   String wrappingColor = 'White & Pink';
 
   @override
@@ -83,7 +83,7 @@ class _BuilderScreenState extends State<BuilderScreen> {
             _buildDropdown(
               title: '필러',
               value: filler,
-              items: ['None', 'Baby’s Breath', 'Eucalyptus'],
+              items: ['None', 'Baby\'s Breath', 'Eucalyptus'],
               onChanged: (value) {
                 setState(() {
                   filler = value!;
