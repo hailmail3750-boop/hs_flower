@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
           width: 600,
           height: 54,
           child: Container(
-            color: Colors.white,
+            color: Colors.grey[100],
             child: Row(
               children: [
                 Expanded(

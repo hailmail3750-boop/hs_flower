@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "415569948772",
+    "project_id": "hs-flower",
+    "storage_bucket": "hs-flower.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415569948772:android:316661d88e58c342ebaf71",
+        "android_client_info": {
+          "package_name": "com.example.hs_flower"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgpOm7TAfqbH0X_dbKB8ANliaY5mG5lEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hs_flower/models/flower_item.dart';
+import 'package:hs_flower/services/flower_service.dart';
 
 class CreateFlower extends StatefulWidget {
   const CreateFlower({super.key});
@@ -12,54 +14,33 @@ class CreateFlower extends StatefulWidget {
 
 class _CreateFlowerState extends State<CreateFlower> {
   String selectedCategory = '꽃';
-  String? selectedItem;
+  String? selectedItemId;
+  FlowerItem? selectedItem;
   Map<String, int> colorQuantities = {};
 
-  final Map<String, List<String>> categoryItems = {
-    '꽃': ['장미\n그림', '해바라기\n그림', '카네이션\n그림', '튤립\n그림'],
-    '필러': ['안개꽃\n그림', '수국\n그림', '유칼립투스\n그림', '라그라스\n그림'],
-    '포장지': ['빨간색\n그림', '초록색\n그림', '분홍색\n그림', '흰색\n그림'],
-    '리본': ['빨간 리본\n그림', '흰 리본\n그림', '금색 리본\n그림'],
-    '문구': ['생일축하\n문구', '사랑해\n문구', '감사해\n문구'],
-  };
+  final FlowerService _flowerService = FlowerService();
+  final List<String> categories = ['꽃', '필러', '포장지', '리본', '문구'];
+  Map<String, List<FlowerItem>> itemsByCategory = {};
 
-  final Map<String, List<String>> itemColors = {
-    '장미\n그림': ['빨간장미 그림', '노란장미 그림', '주황장미 그림', '분홍장미 그림'],
-    '해바라기\n그림': ['노란해바라기 그림', '주황해바라기 그림'],
-    '카네이션\n그림': ['빨간카네이션 그림', '분홍카네이션 그림', '흰카네이션 그림'],
-    '튤립\n그림': ['빨간튤립 그림', '노란튤립 그림', '분홍튤립 그림'],
-    '안개꽃\n그림': ['하얀안개꽃 그림', '파란안개꽃 그림', '분홍안개꽃 그림'],
-    '수국\n그림': ['파란수국 그림', '분홍수국 그림', '흰수국 그림'],
-    '유칼립투스\n그림': ['초록유칼립투스 그림'],
-    '라그라스\n그림': ['베이지라그라스 그림'],
-    '빨간색\n그림': ['빨간색 포장지'],
-    '초록색\n그림': ['초록색 포장지'],
-    '분홍색\n그림': ['분홍색 포장지'],
-    '흰색\n그림': ['흰색 포장지'],
-    '빨간 리본\n그림': ['빨간 리본'],
-    '흰 리본\n그림': ['흰 리본'],
-    '금색 리본\n그림': ['금색 리본'],
-    '생일축하\n문구': ['생일축하'],
-    '사랑해\n문구': ['사랑해'],
-    '감사해\n문구': ['감사해'],
-  };
+  @override
+  void initState() {
+    super.initState();
+    _loadAllCategories();
+  }
+
+  Future<void> _loadAllCategories() async {
+    for (String category in categories) {
+      final items = await _flowerService.getItemsByCategory(category);
+      setState(() {
+        itemsByCategory[category] = items;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E5E5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          '나만의 꽃 만들기',
-          style: TextStyle(color: Colors.black, fontSize: 18),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: SafeArea(
         child: Center(
           child: Container(
@@ -67,7 +48,28 @@ class _CreateFlowerState extends State<CreateFlower> {
             color: Colors.white,
             child: Column(
               children: [
-                const SizedBox(height: 30),
+                Container(
+                  height: 56,
+                  color: Colors.white,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.black),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      const Expanded(
+                        child: Center(
+                          child: Text(
+                            '나만의 꽃 만들기',
+                            style: TextStyle(color: Colors.black, fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 48),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
 
                 Container(
                   width: 515,
@@ -104,14 +106,16 @@ class _CreateFlowerState extends State<CreateFlower> {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: categoryItems.keys.map((category) {
+                          children: categories.map((category) {
                             return CategoryButton(
                               text: category,
                               isSelected: selectedCategory == category,
                               onTap: () {
                                 setState(() {
                                   selectedCategory = category;
+                                  selectedItemId = null;
                                   selectedItem = null;
+                                  colorQuantities.clear();
                                 });
                               },
                             );
@@ -122,23 +126,33 @@ class _CreateFlowerState extends State<CreateFlower> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children:
-                                categoryItems[selectedCategory]!.map((item) {
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedItem = item;
-                                  });
-                                },
-                                child: FlowerBox(
-                                  text: item,
-                                  isSelected: selectedItem == item,
+                          child: itemsByCategory[selectedCategory]?.isNotEmpty ?? false
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: itemsByCategory[selectedCategory]!
+                                      .map((item) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedItemId = item.id;
+                                          selectedItem = item;
+                                          colorQuantities.clear();
+                                        });
+                                      },
+                                      child: FlowerBox(
+                                        item: item,
+                                        isSelected: selectedItemId == item.id,
+                                        flowerService: _flowerService,
+                                      ),
+                                    );
+                                  }).toList(),
+                                )
+                              : Center(
+                                  child: Text(
+                                    '항목 로드 중...',
+                                    style: TextStyle(color: Colors.grey[400]),
+                                  ),
                                 ),
-                              );
-                            }).toList(),
-                          ),
                         ),
                       ),
                     ],
@@ -170,7 +184,7 @@ class _CreateFlowerState extends State<CreateFlower> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                   ),
-                  child: selectedItem == null || !itemColors.containsKey(selectedItem)
+                  child: selectedItem == null || selectedItem!.colors.isEmpty
                       ? Center(
                           child: Text(
                             '꽃을 선택해주세요',
@@ -183,13 +197,10 @@ class _CreateFlowerState extends State<CreateFlower> {
                       : Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            ...itemColors[selectedItem]!
-                                .asMap()
-                                .entries
-                                .map((entry) {
+                            ...selectedItem!.colors.asMap().entries.map((entry) {
                               final colorName = entry.value;
                               final isLast =
-                                  entry.key == itemColors[selectedItem]!.length - 1;
+                                  entry.key == selectedItem!.colors.length - 1;
                               return Column(
                                 children: [
                                   ColorRow(
@@ -284,36 +295,80 @@ class CategoryButton extends StatelessWidget {
   }
 }
 
-class FlowerBox extends StatelessWidget {
-  final String text;
-  final Color color;
+class FlowerBox extends StatefulWidget {
+  final FlowerItem item;
   final bool isSelected;
+  final FlowerService flowerService;
 
   const FlowerBox({
     super.key,
-    required this.text,
-    this.color = CreateFlower.blue,
+    required this.item,
     this.isSelected = false,
+    required this.flowerService,
   });
+
+  @override
+  State<FlowerBox> createState() => _FlowerBoxState();
+}
+
+class _FlowerBoxState extends State<FlowerBox> {
+  String? _imageUrl;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    final url = await widget.flowerService.getImageUrl(widget.item.storagePath);
+    setState(() {
+      _imageUrl = url;
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 92,
       height: 128,
-      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: isSelected ? CreateFlower.blue : Colors.grey[300],
-        border: isSelected ? Border.all(color: CreateFlower.blue, width: 3) : null,
+        color: widget.isSelected ? CreateFlower.blue : Colors.grey[300],
+        border: widget.isSelected
+            ? Border.all(color: CreateFlower.blue, width: 3)
+            : null,
       ),
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: isSelected ? Colors.white : Colors.black,
-          fontSize: 17,
-        ),
-      ),
+      child: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _imageUrl != null
+              ? Image.network(
+                  _imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        widget.item.name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: widget.isSelected ? Colors.white : Colors.black,
+                          fontSize: 12,
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : Center(
+                  child: Text(
+                    widget.item.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: widget.isSelected ? Colors.white : Colors.black,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
     );
   }
 }
